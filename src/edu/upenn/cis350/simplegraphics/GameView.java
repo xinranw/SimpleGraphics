@@ -11,20 +11,23 @@ import android.view.MotionEvent;
 import android.view.View;
 
 public class GameView extends View {
+	private MainActivity parentActivity;
+	
 	private Paint p;
 	private ArrayList<Point> points;
 	private Bitmap image;
 	private Point imageLocation;
 	private double imageAngle;
 	private int imageVelocity;
-	private BackgroundTask imageMover;
 	private int viewWidth;
 	private int viewHeight;
 	private boolean hasFinished;
+	private int score;
+	private int deaths;
 
 	private final int IMAGE_WIDTH = 150;
 	private final int IMAGE_HEIGHT = 150;
-	private final int SLEEP_TIME = 500;
+	private final int SLEEP_TIME = 50;
 
 	public GameView(Context context) {
 		super(context);
@@ -45,12 +48,14 @@ public class GameView extends View {
 
 		new BackgroundTask().execute();
 		hasFinished = false;
+		score = 0;
+		deaths = 0;
 	}
 
 	public void onDraw(Canvas c) {
 		if (hasFinished) {
 			hasFinished = false;
-			new BackgroundTask().execute(); 
+			new BackgroundTask().execute();
 		}
 		c.drawBitmap(image, imageLocation.x, imageLocation.y, null);
 
@@ -64,12 +69,24 @@ public class GameView extends View {
 		}
 	}
 
+	public void setParent(MainActivity parent){
+		this.parentActivity = parent;
+	}
+	
 	public boolean onTouchEvent(MotionEvent e) {
 		if (e.getAction() == MotionEvent.ACTION_DOWN
 				|| e.getAction() == MotionEvent.ACTION_MOVE) {
+			int x = (int) e.getX();
+			int y = (int) e.getY();
+			if (intersectsImage(x, y)){
+				increaseVelocity();
+				setImageStartLocationAndAngle();
+				updateScore();
+			}
+				
 			Point pt = new Point();
-			pt.x = (int) e.getX();
-			pt.y = (int) e.getY();
+			pt.x = x;
+			pt.y = y;
 			points.add(pt);
 			invalidate(); // force redraw
 			return true;
@@ -110,8 +127,27 @@ public class GameView extends View {
 		imageLocation.x += (int) imageVelocity * Math.cos(imageAngle);
 		imageLocation.y += (int) imageVelocity * Math.sin(imageAngle);
 		if (imageLocation.x + IMAGE_WIDTH > viewWidth) {
+			deaths++;
 			setImageStartLocationAndAngle();
 		}
+	}
+
+	private boolean intersectsImage(int x, int y) {
+		if ((imageLocation.x <= x) && (imageLocation.x + IMAGE_WIDTH >= x)
+				&& (imageLocation.y <= y)
+				&& (imageLocation.y + IMAGE_HEIGHT >= y)) {
+			return true;
+		}
+		return false;
+	}
+	
+	private void updateScore(){
+		score++;
+		parentActivity.updateScore(score);
+	}
+	
+	private void increaseVelocity(){
+		imageVelocity = imageVelocity * 6 / 5;
 	}
 
 	// class that will run in the background
@@ -119,6 +155,7 @@ public class GameView extends View {
 	class BackgroundTask extends AsyncTask<Void, Void, String> {
 		// automatically called by execute
 		protected String doInBackground(Void... args) {
+			hasFinished = false;
 			try {
 				Thread.sleep(SLEEP_TIME);
 			} catch (Exception e) {
