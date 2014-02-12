@@ -11,26 +11,29 @@ android:layout_height="fill_parent">
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Welcome to the Unicorn Game!"/>
+            android:text="Score: "/>
 
-    </LinearLayout>
-     <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
-
-        <Button android:id="@+id/new_game"
-            android:text="@string/new_game"
+        <TextView android:id="@+id/score"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:onClick="onNewGameButtonClick"/>
+            android:text="0"/>
         
-        <Button android:id="@+id/quit"
-            android:text="@string/quit"
+        <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:onClick="onQuitButtonClick"/>
+            android:text=" Deaths: "/>
+        
+        <TextView android:id="@+id/deaths"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="0"/>
 
     </LinearLayout>
- 
+
+    <edu.upenn.cis350.simplegraphics.GameView
+        android:id="@+id/gameView"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_weight="1"/>
+
 </LinearLayout>

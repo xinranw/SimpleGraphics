@@ -2,23 +2,18 @@ package edu.upenn.cis350.simplegraphics;
 
 import android.os.Bundle;
 import android.app.Activity;
+import android.content.Intent;
 import android.util.Log;
 import android.view.Menu;
-import android.widget.TextView;
+import android.view.View;
 
 public class MainActivity extends Activity {
-	private GameView gv;
-	private TextView tv;
+	public static final int GameActivity_ID = 1;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-		
-		gv = (GameView) findViewById(R.id.gameView);
-		gv.setParent(this);
-		
-		tv = (TextView) findViewById(R.id.scoreboard);
 	}
 
 	@Override
@@ -27,8 +22,17 @@ public class MainActivity extends Activity {
 		getMenuInflater().inflate(R.menu.main, menu);
 		return true;
 	}
+	
+	protected void onActivityResult(int requestCode, int resultCode, Intent intent){
+		super.onActivityResult(requestCode, resultCode, intent);
+	}
+	
+	public void onNewGameButtonClick(View v){
+		Intent i = new Intent(this, GameActivity.class);
+		startActivityForResult(i, GameActivity_ID);
+	}
 
-	public void updateScore(int newScore){
-		tv.setText( " " + newScore);
+	public void onQuitButtonClick(View v){
+		finish();
 	}
 }

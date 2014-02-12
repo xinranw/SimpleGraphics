@@ -22,6 +22,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name="edu.upenn.cis350.simplegraphics.GameActivity" />
     </application>
 
 </manifest>

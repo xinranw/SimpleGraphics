@@ -9,10 +9,10 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Toast;
 
 public class GameView extends View {
-	private MainActivity parentActivity;
-	
+	private GameActivity parentActivity;
 	private Paint p;
 	private ArrayList<Point> points;
 	private Bitmap image;
@@ -69,21 +69,21 @@ public class GameView extends View {
 		}
 	}
 
-	public void setParent(MainActivity parent){
+	public void setParent(GameActivity parent) {
 		this.parentActivity = parent;
 	}
-	
+
 	public boolean onTouchEvent(MotionEvent e) {
 		if (e.getAction() == MotionEvent.ACTION_DOWN
 				|| e.getAction() == MotionEvent.ACTION_MOVE) {
 			int x = (int) e.getX();
 			int y = (int) e.getY();
-			if (intersectsImage(x, y)){
+			if (intersectsImage(x, y)) {
 				increaseVelocity();
 				setImageStartLocationAndAngle();
 				updateScore();
 			}
-				
+
 			Point pt = new Point();
 			pt.x = x;
 			pt.y = y;
@@ -126,8 +126,11 @@ public class GameView extends View {
 		viewHeight = this.getHeight();
 		imageLocation.x += (int) imageVelocity * Math.cos(imageAngle);
 		imageLocation.y += (int) imageVelocity * Math.sin(imageAngle);
-		if (imageLocation.x + IMAGE_WIDTH > viewWidth) {
-			deaths++;
+		boolean imageOffScreen = (imageLocation.x + IMAGE_WIDTH > viewWidth)
+				|| (imageLocation.y <= 0)
+				|| (imageLocation.y + IMAGE_HEIGHT > viewHeight);
+		if (imageOffScreen) {
+			updateDeaths();
 			setImageStartLocationAndAngle();
 		}
 	}
@@ -140,14 +143,36 @@ public class GameView extends View {
 		}
 		return false;
 	}
-	
-	private void updateScore(){
+
+	private void updateScore() {
 		score++;
 		parentActivity.updateScore(score);
+		if (score >= 5) {
+			endGame(true);
+		}
 	}
-	
-	private void increaseVelocity(){
+
+	private void updateDeaths() {
+		deaths++;
+		parentActivity.updateDeaths(deaths);
+		if (deaths == 3) {
+			endGame(false);
+		}
+	}
+
+	private void increaseVelocity() {
 		imageVelocity = imageVelocity * 6 / 5;
+	}
+
+	private void endGame(boolean won) {
+		if (won) {
+			Toast.makeText(parentActivity, "Congrats, you win!",
+					Toast.LENGTH_SHORT).show();
+		} else {
+			Toast.makeText(parentActivity, "You lose!",
+					Toast.LENGTH_SHORT).show();
+		}
+		parentActivity.endGame();
 	}
 
 	// class that will run in the background
@@ -156,6 +181,7 @@ public class GameView extends View {
 		// automatically called by execute
 		protected String doInBackground(Void... args) {
 			hasFinished = false;
+			Log.i("System.out", "running");
 			try {
 				Thread.sleep(SLEEP_TIME);
 			} catch (Exception e) {
