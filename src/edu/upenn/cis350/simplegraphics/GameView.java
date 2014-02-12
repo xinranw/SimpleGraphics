@@ -15,15 +15,16 @@ public class GameView extends View {
 	private ArrayList<Point> points;
 	private Bitmap image;
 	private Point imageLocation;
+	private double imageAngle;
+	private int imageVelocity;
 	private BackgroundTask imageMover;
-	private final int IMAGE_WIDTH = 150;
-	private final int IMAGE_HEIGHT = 150;
-	
 	private int viewWidth;
 	private int viewHeight;
-	
-	private final int SLEEP_TIME = 1000;
-	
+	private boolean hasFinished;
+
+	private final int IMAGE_WIDTH = 150;
+	private final int IMAGE_HEIGHT = 150;
+	private final int SLEEP_TIME = 500;
 
 	public GameView(Context context) {
 		super(context);
@@ -41,13 +42,16 @@ public class GameView extends View {
 		setupPen();
 
 		points = new ArrayList<Point>();
-		
-		imageMover = new BackgroundTask();
-		imageMover.execute();
+
+		new BackgroundTask().execute();
+		hasFinished = false;
 	}
 
 	public void onDraw(Canvas c) {
-		imageMover.onPostExecute(""); // running too much
+		if (hasFinished) {
+			hasFinished = false;
+			new BackgroundTask().execute(); 
+		}
 		c.drawBitmap(image, imageLocation.x, imageLocation.y, null);
 
 		if (points.isEmpty()) {
@@ -77,42 +81,49 @@ public class GameView extends View {
 		return false;
 	}
 
-	private void moveImage(){
-		viewWidth = this.getWidth();
-		viewHeight = this.getHeight();
-		imageLocation.x += 50;
-		if (imageLocation.x + IMAGE_WIDTH > viewWidth){
-			imageLocation.x = 0;
-		}
-	}
-	
-	private void loadBgAndImages(){
+	private void loadBgAndImages() {
 		setBackgroundResource(R.drawable.space);
 		image = BitmapFactory
 				.decodeResource(getResources(), R.drawable.unicorn);
-		image = Bitmap.createScaledBitmap(image, IMAGE_WIDTH, IMAGE_HEIGHT, false);
+		image = Bitmap.createScaledBitmap(image, IMAGE_WIDTH, IMAGE_HEIGHT,
+				false);
 		imageLocation = new Point();
-		imageLocation.x = 0;
-		imageLocation.y = 100;
+		setImageStartLocationAndAngle();
+		imageVelocity = 20;
 	}
-	
-	private void setupPen(){
+
+	private void setImageStartLocationAndAngle() {
+		imageLocation.x = -IMAGE_WIDTH;
+		imageLocation.y = (int) Math.round(Math.random() * 200 + 200);
+		imageAngle = Math.random() * Math.PI / 3.0 - Math.PI / 6.0;
+	}
+
+	private void setupPen() {
 		p = new Paint();
 		p.setColor(Color.RED);
 		p.setStrokeWidth(10);
 	}
-	
+
+	private void moveImage() {
+		viewWidth = this.getWidth();
+		viewHeight = this.getHeight();
+		imageLocation.x += (int) imageVelocity * Math.cos(imageAngle);
+		imageLocation.y += (int) imageVelocity * Math.sin(imageAngle);
+		if (imageLocation.x + IMAGE_WIDTH > viewWidth) {
+			setImageStartLocationAndAngle();
+		}
+	}
+
 	// class that will run in the background
-	// <Parameters, Progress Result>
-	class BackgroundTask extends AsyncTask<String, Void, String> {
+	// <Parameters, Progress, Result>
+	class BackgroundTask extends AsyncTask<Void, Void, String> {
 		// automatically called by execute
-		protected String doInBackground(String... args) {
+		protected String doInBackground(Void... args) {
 			try {
 				Thread.sleep(SLEEP_TIME);
 			} catch (Exception e) {
 			}
-			String reply = "";
-			return reply; // this gets sent to onPostExecute
+			return ""; // this gets sent to onPostExecute
 		}
 
 		// automatically called when doInBackground is done
@@ -120,6 +131,7 @@ public class GameView extends View {
 			// update Views in the UI
 			moveImage();
 			invalidate();
+			hasFinished = true;
 		}
 	}
 
