@@ -1,9 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">SimpleGraphics</string>
+    <!-- Label shown on launcher icon -->
+    <!-- Label for the this application displayed on-screen when this application must be represented to the user. -->
+    <string name="app_name">Floppy Unicorn</string>
+    
+    <!-- Settings label -->
     <string name="action_settings">Settings</string>
+    
+    <!-- Title shown on the home screen -->
+    <string name="welcome_title">Welcome to Floppy Unicorn!</string>
+    
+    <!-- Text shown on the button to create a new game -->
     <string name="new_game">New Game</string>
+    
+    <!-- Text shown on the button to quit the app -->
     <string name="quit">Quit</string>
 
 </resources>

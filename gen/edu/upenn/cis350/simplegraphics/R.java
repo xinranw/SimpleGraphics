@@ -41,10 +41,22 @@ public final class R {
         public static final int main=0x7f070000;
     }
     public static final class string {
+        /**  Settings label 
+         */
         public static final int action_settings=0x7f050001;
+        /**  Label shown on launcher icon 
+ Label for the this application displayed on-screen when this application must be represented to the user. 
+         */
         public static final int app_name=0x7f050000;
-        public static final int new_game=0x7f050002;
-        public static final int quit=0x7f050003;
+        /**  Text shown on the button to create a new game 
+         */
+        public static final int new_game=0x7f050003;
+        /**  Text shown on the button to quit the app 
+         */
+        public static final int quit=0x7f050004;
+        /**  Title shown on the home screen 
+         */
+        public static final int welcome_title=0x7f050002;
     }
     public static final class style {
         /** 
